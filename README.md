@@ -10,3 +10,6 @@
 很简单的小游戏
 
 需要PYTHON3.x.x以上的运行环境！
+
+我们使用station.json用作题库，你可以根据格式自行编辑（所以你高兴，也可以把它变成各种城市地铁！）
+如果你想游玩，必须需要Python3、station.json和最重要的subway_quiz.py
