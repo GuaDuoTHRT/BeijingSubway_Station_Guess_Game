@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>🚇 北京地铁站猜猜乐  By @呱瓜多米</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(145deg, #f5f0eb 0%, #e8e0d8 100%);
+            font-family: 'PingFang SC', 'Microsoft YaHei', 'Helvetica Neue', Arial, sans-serif;
+            padding: 20px;
+        }
+
+        .card {
+            max-width: 640px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 48px;
+            padding: 32px 28px 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12), 0 8px 24px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: all 0.2s;
+        }
+
+        /* 北京地铁标识 */
+        .logo-wrap {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: #0033a0;
+            padding: 8px 24px 8px 20px;
+            border-radius: 40px;
+            box-shadow: 0 4px 12px rgba(0, 51, 160, 0.25);
+        }
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 20px;
+            color: #0033a0;
+            letter-spacing: -1px;
+        }
+        .logo-text {
+            color: white;
+            font-weight: 600;
+            font-size: 18px;
+            letter-spacing: 2px;
+        }
+        .logo-text small {
+            font-weight: 300;
+            font-size: 13px;
+            opacity: 0.8;
+            margin-left: 4px;
+        }
+
+        /* 标题 */
+        .title {
+            text-align: center;
+            font-size: 26px;
+            font-weight: 700;
+            color: #1e2a3a;
+            margin-bottom: 6px;
+            letter-spacing: 1px;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 15px;
+            color: #7a8a9e;
+            margin-bottom: 24px;
+            font-weight: 400;
+        }
+        .subtitle span {
+            background: #eef3f8;
+            padding: 2px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #2c3e50;
+        }
+
+        /* 线索区 */
+        .clues {
+            background: #f8f6f3;
+            border-radius: 28px;
+            padding: 24px 22px;
+            margin-bottom: 24px;
+            border: 1px solid #ede8e2;
+        }
+        .clue-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e3dcd4;
+        }
+        .clue-item:last-child {
+            border-bottom: none;
+        }
+        .clue-num {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            background: #0033a0;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            margin-top: 1px;
+        }
+        .clue-text {
+            font-size: 17px;
+            line-height: 1.6;
+            color: #1e2a3a;
+            font-weight: 500;
+            word-break: break-word;
+        }
+        .clue-text .highlight {
+            color: #0033a0;
+            font-weight: 700;
+        }
+
+        /* 输入 & 按钮 */
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 14px;
+            flex-wrap: wrap;
+        }
+        .input-row input {
+            flex: 1;
+            min-width: 180px;
+            padding: 16px 20px;
+            border: 2px solid #dcd5cd;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 500;
+            background: #fcfaf8;
+            transition: 0.2s;
+            outline: none;
+            color: #1e2a3a;
+        }
+        .input-row input:focus {
+            border-color: #0033a0;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(0, 51, 160, 0.10);
+        }
+        .input-row input::placeholder {
+            color: #b0a89e;
+            font-weight: 400;
+            font-size: 15px;
+        }
+        .btn-group {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            padding: 16px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            background: #e8e0d8;
+            color: #2c3e50;
+        }
+        .btn-primary {
+            background: #0033a0;
+            color: white;
+            box-shadow: 0 4px 14px rgba(0, 51, 160, 0.25);
+        }
+        .btn-primary:hover {
+            background: #002a85;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(0, 51, 160, 0.30);
+        }
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+        .btn-secondary {
+            background: #eef3f8;
+            color: #1e2a3a;
+        }
+        .btn-secondary:hover {
+            background: #e2e9f0;
+        }
+        .btn-success {
+            background: #0f7b3a;
+            color: white;
+            box-shadow: 0 4px 14px rgba(15, 123, 58, 0.25);
+        }
+        .btn-success:hover {
+            background: #0c682f;
+            transform: translateY(-2px);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        /* 反馈 */
+        .feedback {
+            min-height: 52px;
+            padding: 14px 20px;
+            border-radius: 20px;
+            font-size: 16px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+            transition: 0.2s;
+            background: #f4f1ed;
+            color: #2c3e50;
+        }
+        .feedback.correct {
+            background: #e1f3e8;
+            color: #0f7b3a;
+        }
+        .feedback.wrong {
+            background: #fde8e8;
+            color: #b33a3a;
+        }
+        .feedback .emoji {
+            font-size: 22px;
+        }
+
+        /* 统计 */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 18px;
+            font-size: 14px;
+            color: #7a8a9e;
+            border-top: 1px solid #ede8e2;
+            padding-top: 16px;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .stats strong {
+            color: #1e2a3a;
+            font-weight: 600;
+        }
+
+        /* 响应式 */
+        @media (max-width: 480px) {
+            .card {
+                padding: 22px 16px 28px;
+                border-radius: 32px;
+            }
+            .logo {
+                padding: 6px 16px 6px 14px;
+            }
+            .logo-icon {
+                width: 32px;
+                height: 32px;
+                font-size: 16px;
+            }
+            .logo-text {
+                font-size: 15px;
+            }
+            .title {
+                font-size: 22px;
+            }
+            .clue-text {
+                font-size: 15px;
+            }
+            .input-row input {
+                font-size: 15px;
+                padding: 14px 16px;
+            }
+            .btn {
+                padding: 14px 20px;
+                font-size: 15px;
+            }
+            .feedback {
+                font-size: 14px;
+                padding: 12px 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card" id="app">
+        <!-- 北京地铁标识 -->
+        <div class="logo-wrap">
+            <div class="logo">
+                <div class="logo-icon">🚇</div>
+                <div class="logo-text">北京地铁 <small>BEIJING SUBWAY</small></div>
+            </div>
+        </div>
+
+        <div class="title">📍 猜猜这是哪一站？</div>
+        <div class="subtitle"><span>输入完整站名 · 含“站”字</span></div>
+
+        <!-- 线索 -->
+        <div class="clues" id="cluesContainer">
+            <div class="clue-item">
+                <div class="clue-num">1</div>
+                <div class="clue-text" id="clue1">—</div>
+            </div>
+            <div class="clue-item">
+                <div class="clue-num">2</div>
+                <div class="clue-text" id="clue2">—</div>
+            </div>
+            <div class="clue-item">
+                <div class="clue-num">3</div>
+                <div class="clue-text" id="clue3">—</div>
+            </div>
+        </div>
+
+        <!-- 输入 & 操作 -->
+        <div class="input-row">
+            <input type="text" id="answerInput" placeholder="例如：林萃桥站" autocomplete="off" />
+            <div class="btn-group">
+                <button class="btn btn-primary" id="guessBtn">↵ 猜</button>
+                <button class="btn btn-secondary" id="nextBtn">🎲 下一站</button>
+            </div>
+        </div>
+
+        <!-- 反馈 -->
+        <div class="feedback" id="feedback">💡 输入站名，点击“猜”</div>
+
+        <!-- 统计 -->
+        <div class="stats">
+            <span>📊 已猜 <strong id="totalCount">0</strong> 站</span>
+            <span>✅ 正确 <strong id="correctCount">0</strong></span>
+            <span>📈 正确率 <strong id="rate">0%</strong></span>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        //  北京地铁站名数据（含未开通 / 在建 / 预留）
+        //  数据来源：bjsubway.com 及 维基百科 北京地铁车站列表
+        //  收录范围：1～19号线、八通、大兴、房山、昌平、亦庄、
+        //  燕房、S1、西郊、亦庄T1、首都机场、大兴机场，以及部分
+        //  在建/未开通车站（福寿岭、三家店、黑石头、高井、通运门、
+        //  东大桥、金台夕照、红庙、慈云寺桥、甘露园、定福庄、永顺、
+        //  北关、运河商务区、城市副中心、政务中心、政务中心东、
+        //  马坊、马昌营、农业创新港、平谷、北沙滩、清河小营桥、
+        //  清河、新龙泽、生命谷、西三旗等）
+        //  总数：约 480+ 站（含换乘站重复计名，但作为猜谜池已去重）
+        // ============================================================
+        const STATIONS = [
+            // ---- 1号线 + 八通线（贯通） ----
+            "古城站", "八角游乐园站", "八宝山站", "玉泉路站", "五棵松站", "万寿路站",
+            "公主坟站", "军事博物馆站", "木樨地站", "南礼士路站", "复兴门站",
+            "西单站", "天安门西站", "天安门东站", "王府井站", "东单站", "建国门站",
+            "永安里站", "国贸站", "大望路站", "四惠站", "四惠东站", "高碑店站",
+            "传媒大学站", "双桥站", "管庄站", "八里桥站", "通州北苑站", "果园站",
+            "九棵树站", "梨园站", "临河里站", "土桥站", "花庄站", "环球度假区站",
+            // 1号线 未开通 / 战备
+            "福寿岭站", "三家店站", "黑石头站", "高井站",
+
+            // ---- 2号线 ----
+            "西直门站", "积水潭站", "鼓楼大街站", "安定门站", "雍和宫站",
+            "东直门站", "东四十条站", "朝阳门站", "建国门站", "北京站",
+            "崇文门站", "前门站", "和平门站", "宣武门站", "长椿街站",
+            "复兴门站", "阜成门站", "车公庄站",
+
+            // ---- 3号线 ----
+            "东四十条站", "工人体育场站", "团结湖站", "朝阳公园站", "石佛营站",
+            "朝阳站", "姚家园站", "东坝南站", "东坝站", "东坝北站",
+
+            // ---- 4号线 + 大兴线 ----
+            "安河桥北站", "北宫门站", "西苑站", "圆明园站", "北京大学东门站",
+            "中关村站", "海淀黄庄站", "人民大学站", "魏公村站", "国家图书馆站",
+            "动物园站", "西直门站", "新街口站", "平安里站", "西四站",
+            "灵境胡同站", "西单站", "宣武门站", "菜市口站", "陶然亭站",
+            "北京南站", "马家堡站", "角门西站", "公益西桥站", "新宫站",
+            "西红门站", "高米店北站", "高米店南站", "枣园站", "清源路站",
+            "黄村西大街站", "黄村火车站", "义和庄站", "生物医药基地站", "天宫院站",
+
+            // ---- 5号线 ----
+            "宋家庄站", "刘家窑站", "蒲黄榆站", "天坛东门站", "磁器口站",
+            "崇文门站", "东单站", "灯市口站", "东四站", "张自忠路站",
+            "北新桥站", "雍和宫站", "和平里北街站", "和平西桥站",
+            "惠新西街南口站", "惠新西街北口站", "大屯路东站", "北苑路北站",
+            "立水桥南站", "立水桥站", "天通苑南站", "天通苑站", "天通苑北站",
+
+            // ---- 6号线 ----
+            "金安桥站", "苹果园站", "杨庄站", "西黄村站", "廖公庄站",
+            "田村站", "海淀五路居站", "慈寿寺站", "花园桥站", "白石桥南站",
+            "二里沟站", "车公庄西站", "车公庄站", "平安里站", "北海北站",
+            "南锣鼓巷站", "东四站", "朝阳门站", "东大桥站", "呼家楼站",
+            "金台路站", "十里堡站", "青年路站", "褡裢坡站", "黄渠站",
+            "常营站", "草房站", "物资学院路站", "通州北关站", "北运河西站",
+            "郝家府站", "东夏园站", "潞城站",
+            // 6号线 未开通
+            "通运门站",
+
+            // ---- 7号线 ----
+            "北京西站", "湾子站", "达官营站", "广安门内站", "菜市口站",
+            "虎坊桥站", "珠市口站", "桥湾站", "磁器口站", "广渠门内站",
+            "广渠门外站", "双井站", "九龙山站", "大郊亭站", "百子湾站",
+            "化工站", "南楼梓庄站", "欢乐谷景区站", "垡头站", "双合站",
+            "焦化厂站", "黄厂站", "郎辛庄站", "黑庄户站", "万盛西站",
+            "万盛东站", "群芳站", "高楼金站", "花庄站", "环球度假区站",
+
+            // ---- 8号线 ----
+            "朱辛庄站", "育知路站", "平西府站", "回龙观东大街站", "霍营站",
+            "育新站", "西小口站", "永泰庄站", "林萃桥站", "森林公园南门站",
+            "奥林匹克公园站", "奥体中心站", "北土城站", "安华桥站", "安德里北街站",
+            "鼓楼大街站", "什刹海站", "南锣鼓巷站", "中国美术馆站", "金鱼胡同站",
+            "王府井站", "前门站", "珠市口站", "天桥站", "永定门外站",
+            "木樨园站", "海户屯站", "大红门站", "大红门南站", "和义站",
+            "东高地站", "火箭万源站", "五福堂站", "德茂站", "瀛海站",
+
+            // ---- 9号线 ----
+            "国家图书馆站", "白石桥南站", "白堆子站", "军事博物馆站", "北京西站",
+            "六里桥东站", "六里桥站", "七里庄站", "丰台东大街站", "丰台南路站",
+            "科怡路站", "丰台科技园站", "郭公庄站",
+
+            // ---- 10号线 ----
+            "巴沟站", "苏州街站", "海淀黄庄站", "知春里站", "知春路站",
+            "西土城站", "牡丹园站", "健德门站", "北土城站", "安贞门站",
+            "惠新西街南口站", "芍药居站", "太阳宫站", "三元桥站", "亮马桥站",
+            "农业展览馆站", "团结湖站", "呼家楼站", "国贸站", "双井站",
+            "劲松站", "潘家园站", "十里河站", "分钟寺站", "成寿寺站",
+            "宋家庄站", "石榴庄站", "大红门站", "角门东站", "角门西站",
+            "草桥站", "纪家庙站", "首经贸站", "丰台站", "泥洼站",
+            "西局站", "六里桥站", "莲花桥站", "公主坟站", "西钓鱼台站",
+            "慈寿寺站", "车道沟站", "长春桥站", "火器营站",
+
+            // ---- 11号线 ----
+            "模式口站", "金安桥站", "北辛安站", "新首钢站",
+
+            // ---- 12号线 ----
+            "四季青桥站", "蓝靛厂站", "长春桥站", "苏州桥站", "人民大学站",
+            "大钟寺站", "蓟门桥站", "北太平庄站", "马甸桥站", "安华桥站",
+            "安贞桥站", "和平西桥站", "光熙门站", "西坝河站", "东坝河站",
+            "驼房营站", "将台西站", "高家园站", "酒仙桥站", "北岗子站",
+            "东风站",
+
+            // ---- 13号线 ----
+            "西直门站", "大钟寺站", "知春路站", "五道口站", "上地站",
+            "清河站", "西二旗站", "龙泽站", "回龙观站", "霍营站",
+            "立水桥站", "北苑站", "望京西站", "芍药居站", "光熙门站",
+            "柳芳站", "东直门站",
+
+            // ---- 14号线 ----
+            "张郭庄站", "园博园站", "大瓦窑站", "郭庄子站", "七里庄站",
+            "西局站", "东管头站", "丽泽商务区站", "菜户营站", "西铁营站",
+            "景泰站", "永定门外站", "陶然亭站", "北京南站", "右安门外站",
+            "菜市口站", "虎坊桥站", "珠市口站", "金鱼胡同站", "东单站",
+            "金台路站", "朝阳公园站", "枣营站", "东风北桥站", "将台站",
+            "望京南站", "阜通站", "望京站", "东湖渠站", "来广营站",
+            "善各庄站",
+
+            // ---- 15号线 ----
+            "清华东路西口站", "六道口站", "北沙滩站", "奥林匹克公园站",
+            "安立路站", "大屯路东站", "关庄站", "望京西站", "望京站",
+            "望京东站", "崔各庄站", "马泉营站", "孙河站", "国展站",
+            "花梨坎站", "后沙峪站", "南法信站", "石门站", "顺义站",
+            "俸伯站",
+
+            // ---- 16号线 ----
+            "北安河站", "温阳路站", "稻香湖站", "屯佃站", "永丰站",
+            "永丰南站", "西北旺站", "马连洼站", "农大南路站", "西苑站",
+            "万泉河桥站", "苏州街站", "苏州桥站", "万寿寺站", "国家图书馆站",
+            "二里沟站", "甘家口站", "玉渊潭东门站", "木樨地站", "达官营站",
+            "红莲南路站", "丽泽商务区站", "东管头南站", "丰台站", "丰台南路站",
+            "富丰桥站", "看丹站", "榆树庄站", "洪泰庄站", "宛平城站",
+
+            // ---- 17号线 ----
+            "未来科学城北站", "未来科学城站", "天通苑东站", "清河营站", "红军营站",
+            "望京西站", "太阳宫站", "西坝河站", "工人体育场站", "东大桥站",
+            "永安里站", "广渠门外站", "潘家园西站", "十里河站", "十八里店站",
+            "周家庄站", "次渠北站", "次渠站", "嘉会湖站",
+
+            // ---- 18号线（规划中，部分已命名） ----
+            // 暂不收录，避免过多占位
+
+            // ---- 19号线 ----
+            "牡丹园站", "北太平庄站", "积水潭站", "平安里站", "太平桥站",
+            "牛街站", "景风门站", "草桥站", "新发地站", "新宫站",
+
+            // ---- 昌平线 ----
+            "昌平西山口站", "十三陵景区站", "昌平站", "昌平东关站", "北邵洼站",
+            "南邵站", "沙河高教园站", "沙河站", "巩华城站", "朱辛庄站",
+            "生命科学园站", "西二旗站", "清河站",
+
+            // ---- 房山线 ----
+            "东管头南站", "首经贸站", "花乡东桥站", "白盆窑站", "郭公庄站",
+            "大葆台站", "稻田站", "长阳站", "篱笆房站", "广阳城站",
+            "良乡大学城北站", "良乡大学城站", "良乡大学城西站", "良乡南关站",
+            "苏庄站", "阎村东站",
+
+            // ---- 亦庄线 ----
+            "宋家庄站", "肖村站", "小红门站", "旧宫站", "亦庄桥站",
+            "亦庄文化园站", "万源街站", "荣京东街站", "荣昌东街站", "同济南路站",
+            "经海路站", "次渠南站", "次渠站", "亦庄火车站",
+
+            // ---- 燕房线 ----
+            "阎村东站", "紫草坞站", "阎村站", "星城站", "大石河东站",
+            "马各庄站", "饶乐府站", "房山城关站", "燕山站",
+
+            // ---- S1线 ----
+            "苹果园站", "金安桥站", "四道桥站", "桥户营站", "上岸站",
+            "栗园庄站", "小园站", "石厂站",
+
+            // ---- 西郊线 ----
+            "巴沟站", "颐和园西门站", "茶棚站", "万安站", "植物园站",
+            "香山站",
+
+            // ---- 亦庄T1线 ----
+            "老观里站", "屈庄站", "融兴街站", "瑞合庄站", "定海园站",
+            "科创街站", "经海一路站", "经海二路站", "经海三路站", "经海四路站",
+            "经海五路站", "科创十一街站", "科创十二街站", "科创十三街站",
+            "科创十四街站", "科创十五街站", "科创十六街站", "经海路站",
+
+            // ---- 首都机场线 ----
+            "东直门站", "三元桥站", "3号航站楼站", "2号航站楼站",
+
+            // ---- 大兴机场线 ----
+            "草桥站", "大兴新城站", "大兴机场站",
+
+            // ============================================================
+            //  在建 / 未开通 / 预留 线路车站（22号线、28号线、M101等）
+            // ============================================================
+            // 22号线（平谷线）
+            "东大桥站", "金台夕照站", "红庙站", "慈云寺桥站", "甘露园站",
+            "定福庄站", "永顺站", "北关站", "运河商务区站", "城市副中心站",
+            "政务中心站", "政务中心东站", "马坊站", "马昌营站", "农业创新港站",
+            "平谷站",
+            // 19号线二期北延及支线
+            "北沙滩站", "清河小营桥站", "清河站", "新龙泽站", "生命谷站",
+            "西三旗站",
+            // 28号线（部分）
+            "东大桥站", "金台夕照站", "光华东里站", "光华路站", "核心区站",
+            "北京东站", "大郊亭站", "广渠路站",
+            // M101线
+            "商务园站", "通州西站", "通顺路站", "通州会议中心站", "龙旺庄站",
+            "通胡大街站", "玉带河大街站", "城市副中心站", "行政办公区西站",
+            "行政办公区东站", "副中心站", "绿心站", "绿心南站", "张家湾东站",
+            "张家湾站", "张家湾西站", "牛堡屯站", "枣林庄站", "姚辛庄站",
+            "里二泗站", "京杭之星站",
+            // 1号线支线
+            "青龙湖东站", "民族大学站", "王佐站", "云岗站", "后吕村站",
+            "西王佐站", "张郭庄站",
+            // 13号线扩能提升
+            "回龙观东站", "文华路站", "回龙观西站", "新龙泽站",
+            // 其他在建/预留
+            "望京西站", "马甸桥站", "广渠门外站"
+        ];
+
+        // ---- 去重 ----
+        const stationSet = new Set(STATIONS);
+        const uniqueStations = Array.from(stationSet);
+
+        // ---- 游戏状态 ----
+        let currentStation = '';
+        let currentClues = [];
+        let totalAttempts = 0;
+        let correctAttempts = 0;
+        let isAnswered = false;
+
+        // ---- DOM 引用 ----
+        const clueEls = [
+            document.getElementById('clue1'),
+            document.getElementById('clue2'),
+            document.getElementById('clue3')
+        ];
+        const inputEl = document.getElementById('answerInput');
+        const guessBtn = document.getElementById('guessBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const feedbackEl = document.getElementById('feedback');
+        const totalEl = document.getElementById('totalCount');
+        const correctEl = document.getElementById('correctCount');
+        const rateEl = document.getElementById('rate');
+
+        // ---- 辅助函数 ----
+        function shuffleArray(arr) {
+            for (let i = arr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [arr[i], arr[j]] = [arr[j], arr[i]];
+            }
+            return arr;
+        }
+
+        // 生成三条线索
+        function generateClues(stationName) {
+            const name = stationName.replace('站', '');
+            const clues = [];
+
+            // 线索1: 字数
+            const charCount = name.length;
+            clues.push(`站名共 ${charCount} 个字`);
+
+            // 线索2: 首字母 (拼音首字母)
+            const pinyinMap = {
+                '安': 'A',
+                '八': 'B',
+                '巴': 'B',
+                '白': 'B',
+                '百': 'B',
+                '北': 'B',
+                '草': 'C',
+                '车': 'C',
+                '长': 'C',
+                '常': 'C',
+                '朝': 'C',
+                '成': 'C',
+                '慈': 'C',
+                '大': 'D',
+                '德': 'D',
+                '灯': 'D',
+                '定': 'D',
+                '东': 'D',
+                '豆': 'D',
+                '垡': 'F',
+                '方': 'F',
+                '丰': 'F',
+                '俸': 'F',
+                '福': 'F',
+                '富': 'F',
+                '甘': 'G',
+                '高': 'G',
+                '公': 'G',
+                '宫': 'G',
+                '巩': 'G',
+                '鼓': 'G',
+                '故': 'G',
+                '光': 'G',
+                '广': 'G',
+                '郭': 'G',
+                '国': 'G',
+                '海': 'H',
+                '和': 'H',
+                '河': 'H',
+                '黑': 'H',
+                '弘': 'H',
+                '红': 'H',
+                '后': 'H',
+                '呼': 'H',
+                '胡': 'H',
+                '虎': 'H',
+                '花': 'H',
+                '华': 'H',
+                '化': 'H',
+                '槐': 'H',
+                '黄': 'H',
+                '惠': 'H',
+                '火': 'H',
+                '霍': 'H',
+                '机': 'J',
+                '积': 'J',
+                '基': 'J',
+                '吉': 'J',
+                '纪': 'J',
+                '蓟': 'J',
+                '嘉': 'J',
+                '建': 'J',
+                '健': 'J',
+                '将': 'J',
+                '焦': 'J',
+                '角': 'J',
+                '金': 'J',
+                '锦': 'J',
+                '劲': 'J',
+                '经': 'J',
+                '九': 'J',
+                '旧': 'J',
+                '菊': 'J',
+                '军': 'J',
+                '开': 'K',
+                '看': 'K',
+                '科': 'K',
+                '可': 'K',
+                '克': 'K',
+                '空': 'K',
+                '口': 'K',
+                '来': 'L',
+                '莱': 'L',
+                '蓝': 'L',
+                '琅': 'L',
+                '郎': 'L',
+                '老': 'L',
+                '乐': 'L',
+                '雷': 'L',
+                '梨': 'L',
+                '礼': 'L',
+                '李': 'L',
+                '里': 'L',
+                '立': 'L',
+                '丽': 'L',
+                '利': 'L',
+                '连': 'L',
+                '莲': 'L',
+                '两': 'L',
+                '亮': 'L',
+                '廖': 'L',
+                '林': 'L',
+                '临': 'L',
+                '灵': 'L',
+                '刘': 'L',
+                '柳': 'L',
+                '六': 'L',
+                '龙': 'L',
+                '娄': 'L',
+                '卢': 'L',
+                '鲁': 'L',
+                '鹿': 'L',
+                '路': 'L',
+                '潞': 'L',
+                '马': 'M',
+                '麦': 'M',
+                '毛': 'M',
+                '门': 'M',
+                '蒙': 'M',
+                '孟': 'M',
+                '米': 'M',
+                '密': 'M',
+                '棉': 'M',
+                '民': 'M',
+                '闵': 'M',
+                '木': 'M',
+                '慕': 'M',
+                '南': 'N',
+                '泥': 'N',
+                '牛': 'N',
+                '农': 'N',
+                '潘': 'P',
+                '庞': 'P',
+                '平': 'P',
+                '苹': 'P',
+                '蒲': 'P',
+                '七': 'Q',
+                '祈': 'Q',
+                '前': 'Q',
+                '墙': 'Q',
+                '乔': 'Q',
+                '桥': 'Q',
+                '青': 'Q',
+                '清': 'Q',
+                '清': 'Q',
+                '区': 'Q',
+                '屈': 'Q',
+                '渠': 'Q',
+                '全': 'Q',
+                '群': 'Q',
+                '人': 'R',
+                '任': 'R',
+                '日': 'R',
+                '荣': 'R',
+                '儒': 'R',
+                '三': 'S',
+                '森': 'S',
+                '沙': 'S',
+                '山': 'S',
+                '善': 'S',
+                '上': 'S',
+                '芍': 'S',
+                '少': 'S',
+                '邵': 'S',
+                '十': 'S',
+                '石': 'S',
+                '时': 'S',
+                '实': 'S',
+                '什': 'S',
+                '市': 'S',
+                '首': 'S',
+                '寿': 'S',
+                '双': 'S',
+                '水': 'S',
+                '顺': 'S',
+                '司': 'S',
+                '四': 'S',
+                '宋': 'S',
+                '苏': 'S',
+                '苏州': 'S',
+                '孙': 'S',
+                '台': 'T',
+                '太': 'T',
+                '太': 'T',
+                '潭': 'T',
+                '唐': 'T',
+                '陶': 'T',
+                '天': 'T',
+                '田': 'T',
+                '铁': 'T',
+                '通': 'T',
+                '同': 'T',
+                '土': 'T',
+                '团': 'T',
+                '驼': 'T',
+                '万': 'W',
+                '王': 'W',
+                '望': 'W',
+                '微': 'W',
+                '韦': 'W',
+                '魏': 'W',
+                '温': 'W',
+                '文': 'W',
+                '五': 'W',
+                '武': 'W',
+                '西': 'X',
+                '希': 'X',
+                '息': 'X',
+                '席': 'X',
+                '喜': 'X',
+                '下': 'X',
+                '夏': 'X',
+                '先': 'X',
+                '香': 'X',
+                '向': 'X',
+                '肖': 'X',
+                '小': 'X',
+                '孝': 'X',
+                '协': 'X',
+                '新': 'X',
+                '兴': 'X',
+                '星': 'X',
+                '行': 'X',
+                '杏': 'X',
+                '幸': 'X',
+                '熊': 'X',
+                '休': 'X',
+                '秀': 'X',
+                '徐': 'X',
+                '许': 'X',
+                '宣': 'X',
+                '学': 'X',
+                '雪': 'X',
+                '丫': 'Y',
+                '亚': 'Y',
+                '烟': 'Y',
+                '延': 'Y',
+                '闫': 'Y',
+                '阎': 'Y',
+                '燕': 'Y',
+                '羊': 'Y',
+                '阳': 'Y',
+                '杨': 'Y',
+                '姚': 'Y',
+                '药': 'Y',
+                '椰': 'Y',
+                '亦': 'Y',
+                '义': 'Y',
+                '艺': 'Y',
+                '亦': 'Y',
+                '驿': 'Y',
+                '益': 'Y',
+                '意': 'Y',
+                '殷': 'Y',
+                '银': 'Y',
+                '尹': 'Y',
+                '英': 'Y',
+                '营': 'Y',
+                '永': 'Y',
+                '勇': 'Y',
+                '用': 'Y',
+                '幽': 'Y',
+                '游': 'Y',
+                '友': 'Y',
+                '有': 'Y',
+                '于': 'Y',
+                '余': 'Y',
+                '鱼': 'Y',
+                '雨': 'Y',
+                '玉': 'Y',
+                '育': 'Y',
+                '郁': 'Y',
+                '圆': 'Y',
+                '远': 'Y',
+                '院': 'Y',
+                '约': 'Y',
+                '月': 'Y',
+                '悦': 'Y',
+                '云': 'Y',
+                '运': 'Y',
+                '枣': 'Z',
+                '造': 'Z',
+                '皂': 'Z',
+                '则': 'Z',
+                '泽': 'Z',
+                '增': 'Z',
+                '闸': 'Z',
+                '张': 'Z',
+                '章': 'Z',
+                '长': 'Z',
+                '掌': 'Z',
+                '丈': 'Z',
+                '招': 'Z',
+                '昭': 'Z',
+                '朝': 'Z',
+                '真': 'Z',
+                '镇': 'Z',
+                '正': 'Z',
+                '政': 'Z',
+                '郑': 'Z',
+                '知': 'Z',
+                '织': 'Z',
+                '直': 'Z',
+                '植': 'Z',
+                '址': 'Z',
+                '纸': 'Z',
+                '志': 'Z',
+                '制': 'Z',
+                '中': 'Z',
+                '钟': 'Z',
+                '种': 'Z',
+                '重': 'Z',
+                '州': 'Z',
+                '周': 'Z',
+                '朱': 'Z',
+                '珠': 'Z',
+                '诸': 'Z',
+                '竹': 'Z',
+                '主': 'Z',
+                '祝': 'Z',
+                '庄': 'Z',
+                '装': 'Z',
+                '壮': 'Z',
+                '追': 'Z',
+                '准': 'Z',
+                '卓': 'Z',
+                '资': 'Z',
+                '子': 'Z',
+                '字': 'Z',
+                '自': 'Z',
+                '宗': 'Z',
+                '总': 'Z',
+                '走': 'Z',
+                '租': 'Z',
+                '族': 'Z',
+                '祖': 'Z',
+                '钻': 'Z',
+                '最': 'Z',
+                '尊': 'Z',
+                '左': 'Z',
+                '坐': 'Z',
+                '做': 'Z'
+            };
+            const firstChar = name.charAt(0);
+            const initial = pinyinMap[firstChar] || firstChar.toUpperCase();
+            clues.push(`拼音首字母是 ${initial}`);
+
+            // 线索3: 随机一个位置的字（避开首字）
+            let thirdClue = '';
+            if (name.length >= 2) {
+                const idx = Math.floor(Math.random() * (name.length - 1)) + 1;
+                thirdClue = `第 ${idx + 1} 个字是 “${name.charAt(idx)}”`;
+            } else {
+                thirdClue = `只有一个字 “${name}”`;
+            }
+            clues.push(thirdClue);
+
+            return clues;
+        }
+
+        // 随机选一站
+        function pickRandomStation() {
+            const idx = Math.floor(Math.random() * uniqueStations.length);
+            return uniqueStations[idx];
+        }
+
+        // 重置游戏
+        function resetGame() {
+            currentStation = pickRandomStation();
+            currentClues = generateClues(currentStation);
+            for (let i = 0; i < 3; i++) {
+                clueEls[i].textContent = currentClues[i] || '—';
+            }
+            isAnswered = false;
+            inputEl.value = '';
+            inputEl.disabled = false;
+            guessBtn.disabled = false;
+            feedbackEl.className = 'feedback';
+            feedbackEl.innerHTML = '💡 输入站名，点击“猜”';
+            inputEl.focus();
+        }
+
+        // 更新统计
+        function updateStats() {
+            totalEl.textContent = totalAttempts;
+            correctEl.textContent = correctAttempts;
+            const rate = totalAttempts === 0 ? 0 : Math.round((correctAttempts / totalAttempts) * 100);
+            rateEl.textContent = rate + '%';
+        }
+
+        // 处理猜谜
+        function handleGuess() {
+            if (isAnswered) {
+                feedbackEl.className = 'feedback';
+                feedbackEl.innerHTML = '⏳ 这一站已经猜过了，点 “下一站” 继续吧';
+                return;
+            }
+
+            const userInput = inputEl.value.trim();
+            if (!userInput) {
+                feedbackEl.className = 'feedback wrong';
+                feedbackEl.innerHTML = '⚠️ 请输入站名';
+                return;
+            }
+
+            // 标准化：去除多余空格，确保以“站”结尾
+            let normalized = userInput.replace(/\s+/g, '');
+            if (!normalized.endsWith('站')) {
+                normalized += '站';
+            }
+
+            totalAttempts++;
+            const isCorrect = (normalized === currentStation);
+
+            if (isCorrect) {
+                correctAttempts++;
+                feedbackEl.className = 'feedback correct';
+                feedbackEl.innerHTML = `✅ 完全正确！就是 <strong>${currentStation}</strong> ！🎉`;
+                isAnswered = true;
+                inputEl.disabled = true;
+                guessBtn.disabled = true;
+            } else {
+                feedbackEl.className = 'feedback wrong';
+                feedbackEl.innerHTML = `❌ 不对哦，再想想～ 你输入的是 “${normalized}”`;
+            }
+
+            updateStats();
+        }
+
+        // ---- 事件绑定 ----
+        guessBtn.addEventListener('click', handleGuess);
+
+        inputEl.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleGuess();
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            resetGame();
+            // 统计保留
+        });
+
+        // ---- 初始化 ----
+        resetGame();
+        updateStats();
+
+        // ---- 额外：点击卡片任意处聚焦输入框 ----
+        document.querySelector('.card').addEventListener('click', (e) => {
+            if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'BUTTON') {
+                inputEl.focus();
+            }
+        });
+
+        console.log(`🚇 北京地铁站猜谜已启动！共收录 ${uniqueStations.length} 个站名（含未开通）。`);
+    </script>
+
+</body>
+</html>
